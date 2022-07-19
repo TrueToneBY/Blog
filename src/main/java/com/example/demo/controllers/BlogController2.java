@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.logging.Logger;
 
@@ -24,5 +26,34 @@ public class BlogController2 {
         model.addAttribute("posts",posts);
         log.info("http blog");
         return "blog-main";
+    }
+
+    /**
+     * Добовление блога
+     * @param model
+     * @return
+     */
+    @GetMapping("/blog/add")
+    public String blogAdd(Model model){
+        log.info("http blog/add");
+        return "blog-add";
+    }
+
+    /**
+     * Сохронение добавленных объектов
+     * @param title
+     * @param anons
+     * @param full_text
+     * @param model
+     * @return переадресовываем ползователя на главную страницу блога
+     */
+    @PostMapping("/blog/blog/add")
+    public String blogPostAdd(@RequestParam String title,
+                              @RequestParam String anons,
+                              @RequestParam String full_text, Model model){
+        Post post = new Post(anons,title,full_text);
+        postRepository.save(post);
+        log.info("http redirect-blog");
+        return "redirect:/blog";
     }
 }
