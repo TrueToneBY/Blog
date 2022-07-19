@@ -6,10 +6,10 @@ import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 @Controller
@@ -55,5 +55,30 @@ public class BlogController2 {
         postRepository.save(post);
         log.info("http redirect-blog");
         return "redirect:/blog";
+    }
+
+    /**
+     * Найти блог по id
+     * @param id индефикатор
+     * @param model
+     * @return
+     */
+    @GetMapping("/blog/{id}")
+    public String blogDetails(@PathVariable(value = "id") long id, Model model){
+        //проверка на то если ввели несуществующий id
+        if (!postRepository.existsById(id)){
+            return "redirect:/blog";
+        }
+
+        //полученные записи помещаем в обьект который идет на основе класса optional
+        Optional<Post> post = postRepository.findById(id);
+        //Берем динамический лист и указываем что в нутри будут объекты в основе нашей модели Post
+        ArrayList<Post> res = new ArrayList<>();
+        //Оброщаемся к функции ifPresent для перевода из класса Optional в ArrayList
+        post.ifPresent(res::add);
+        //вывод из шаблона из базы данных на экран
+        model.addAttribute("post",res);
+        log.info("http blog-details");
+        return "blog-details";
     }
 }
